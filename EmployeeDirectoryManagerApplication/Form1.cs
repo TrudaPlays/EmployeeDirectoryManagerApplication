@@ -338,6 +338,11 @@ namespace EmployeeDirectoryManagerApplication
             {
                 MessageLabel.Text = $"Duplicate ID '{EmployeeID}'in file.";
             }
+            catch (FileNotFoundException)
+            {
+                MessageLabel.Text = "File not found. Verify it is still on the Desktop and has not been moved";
+            }
+
         }
     }
 }
