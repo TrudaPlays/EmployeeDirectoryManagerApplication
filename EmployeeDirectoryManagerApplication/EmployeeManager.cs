@@ -131,8 +131,7 @@ namespace EmployeeDirectoryManagerApplication
         public bool DeleteEmployee(string employeeID)
         {
             // Find the exact employee by their ID (case-insensitive comparison)
-            var toRemove = Employees.FirstOrDefault(b =>
-                b.EmployeeID.Equals(employeeID, StringComparison.OrdinalIgnoreCase));
+            var toRemove = Employees.FirstOrDefault(e => string.Equals(e.EmployeeID, employeeID, StringComparison.OrdinalIgnoreCase));
 
             if (toRemove == null)
             {

@@ -95,43 +95,18 @@ namespace EmployeeDirectoryManagerApplication
 
             }
         }
-        //this event handler is called when a row of the DataGridView is clicked
-/*        private void EmployeesDataGridView_SelectionChanged(object sender, EventArgs e)
-        {
-            if (EmployeesDataGridView.SelectedRows.Count == 0)
-            {
-                ClearInputFields();
-                MessageLabel.Text = "";
-                return;
-            }
-
-            var selectedRow = EmployeesDataGridView.SelectedRows[0];
-            var employee = (Employee)selectedRow.DataBoundItem;
-
-            if (employee != null)
-            {
-                textEmployeeID.Text = employee.EmployeeID;
-                textFullName.Text = employee.FullName;
-                textDepartment.Text = employee.Department;
-                textRole.Text = employee.Role;
-                textSalary.Text = employee.Salary.ToString("F2");   // 2 decimal places
-                dateTimePickerHireDate.Value = employee.HireDate;
-
-                MessageLabel.Text = $"Editing employee: {employee.FullName} (ID: {employee.EmployeeID})";
-            }
-        }*/
 
         private void btnUpdateEmployee_Click(object sender, EventArgs e)
         {
             try
             {
-                // Make sure something is selected
+                /*// Make sure something is selected
                 if (EmployeesDataGridView.SelectedRows.Count == 0)
                 {
                     MessageLabel.Text = "Please select an employee to update.";
                     MessageLabel.ForeColor = Color.OrangeRed;
                     return;
-                }
+                }*/
 
                 // Get current values from inputs
                 string id = textEmployeeID.Text.Trim();
@@ -162,7 +137,19 @@ namespace EmployeeDirectoryManagerApplication
                 }
 
                 var updatedEmployee = new Employee(id, fullName, department, role, salary, hireDate);
-                
+
+                var existing = manager.Employees.FirstOrDefault(emp => string.Equals(emp.EmployeeID, id, StringComparison.OrdinalIgnoreCase));
+
+                if (existing == null)
+                {
+                    //ID not found
+
+                    MessageLabel.Text = $"No employee found with ID '{id}'. Use the Add button to create new employees.";
+                    MessageLabel.ForeColor = Color.OrangeRed;
+                    textEmployeeID.Focus();
+                    return;
+                }
+
                 manager.UpdateEmployeeData(updatedEmployee);
 
                 // Success
@@ -219,6 +206,55 @@ namespace EmployeeDirectoryManagerApplication
 
                 MessageLabel.Text = $"Editing employee: {employee.FullName} (ID: {employee.EmployeeID})";
                 textEmployeeID.ReadOnly = true;
+            }
+        }
+
+        private void btnDeleteEmployee_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                /*// Make sure something is selected
+                if (EmployeesDataGridView.SelectedRows.Count == 0)
+                {
+                    MessageLabel.Text = "Please select an employee to update.";
+                    MessageLabel.ForeColor = Color.OrangeRed;
+                    return;
+                }*/
+
+                // Get current values from inputs
+                string id = textEmployeeID.Text.Trim();
+                string department = textDepartment.Text.Trim();
+                string role = textRole.Text.Trim();
+                
+
+                // Basic required fields check
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    MessageLabel.Text = "ID is required for deletion";
+                    MessageLabel.ForeColor = Color.OrangeRed;
+                    return;
+                }
+
+                var updatedEmployee = new Employee(id);
+
+                manager.DeleteEmployee(updatedEmployee);
+
+                // Success
+                MessageLabel.Text = $"Employee '{fullName}' (ID: {id}) updated successfully.";
+                MessageLabel.ForeColor = Color.DarkGreen;
+
+                EmployeesDataGridView.Refresh();
+
+            }
+            catch (ArgumentException ex)
+            {
+                MessageLabel.Text = ex.Message;
+                MessageLabel.ForeColor = Color.Red;
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageLabel.Text = ex.Message;
+                MessageLabel.ForeColor = Color.OrangeRed;
             }
         }
     }
