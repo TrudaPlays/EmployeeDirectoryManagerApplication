@@ -169,15 +169,18 @@ namespace EmployeeDirectoryManagerApplication
         // -------- Persistence (CSV) --------
         public void SaveToCsv(string path)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))
-            ?? ".");
-            StreamWriter sw = new StreamWriter(path, false, new
-            UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-            sw.WriteLine("EmployeeID,FullName,Department,Role,Salary,HireDate");
-            foreach (var e in Employees)
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)) ?? ".");
+            using (var sw = new StreamWriter(path, false, new
+            UTF8Encoding(encoderShouldEmitUTF8Identifier: false)))
             {
-                sw.WriteLine(e.ToCsv());
+                sw.WriteLine("EmployeeID,FullName,Department,Role,Salary,HireDate");
+                foreach (var e in Employees)
+                {
+                    sw.WriteLine(e.ToCsv());
+                }
+                sw.Close();
             }
+            
                 
         }
         public void LoadFromCsv(string path)

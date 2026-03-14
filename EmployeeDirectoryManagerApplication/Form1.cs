@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -205,7 +207,7 @@ namespace EmployeeDirectoryManagerApplication
                 dateTimePickerHireDate.Value = employee.HireDate;
 
                 MessageLabel.Text = $"Editing employee: {employee.FullName} (ID: {employee.EmployeeID})";
-                textEmployeeID.ReadOnly = true;
+                
             }
         }
 
@@ -258,6 +260,84 @@ namespace EmployeeDirectoryManagerApplication
         private void btnExitForm_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                EmployeesDataGridView.EndEdit();
+                employeeBindingSource.EndEdit();
+
+                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                string fileName = $"employees_{DateTime.Now:yyyyMMdd}.csv";
+                string filePath = Path.Combine(desktop, fileName);
+
+                manager.SaveToCsv(filePath);
+                
+                MessageLabel.Text = $"Saved {manager.Employees.Count} employees to Desktop:\n{filePath}";
+                MessageLabel.ForeColor = System.Drawing.Color.DarkGreen;
+
+                /*
+                using (SaveFileDialog sfd = new SaveFileDialog())
+                {
+                    sfd.Title = "Saved Employees CSV";
+                    sfd.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
+                    sfd.DefaultExt = "csv";
+                    sfd.AddExtension = true;
+
+                    if (sfd.ShowDialog() == DialogResult.OK)
+                    {
+                        manager.SaveToCsv(sfd.FileName);
+
+                        MessageLabel.Text = $"Saved {manager.Employees.Count} employees to:\n{sfd.FileName}";
+                        MessageLabel.ForeColor = System.Drawing.Color.DarkGreen;
+                    }
+                }*/
+            }
+            catch (Exception ex)
+            {
+                MessageLabel.Text = $"Save failed: {ex.Message}";
+                MessageLabel.ForeColor= Color.Red;
+            }
+
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                string fileName = $"employees_{DateTime.Now:yyyyMMdd}.csv";
+                string filePath = Path.Combine(desktop, fileName);
+
+
+                if (!File.Exists(filePath))
+                {
+                    MessageLabel.Text = $"No file found on Desktop:\n{filePath}";
+                    MessageLabel.ForeColor = System.Drawing.Color.OrangeRed;
+                    return;
+                }
+
+                manager.LoadFromCsv(filePath);
+
+                // Re-bind (safe) and refresh UI
+                employeeBindingSource.DataSource = manager.Employees;
+                EmployeesDataGridView.DataSource = employeeBindingSource;
+                EmployeesDataGridView.Refresh();
+
+                MessageLabel.Text = $"Loaded {manager.Employees.Count} employees from Desktop:\n{filePath}";
+                MessageLabel.ForeColor = System.Drawing.Color.DarkGreen;
+
+            }
+            catch (InvalidDataException ex)
+            {
+                MessageLabel.Text = "File is empty";
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageLabel.Text = $"Duplicate ID '{EmployeeID}'in file.";
+            }
         }
     }
 }

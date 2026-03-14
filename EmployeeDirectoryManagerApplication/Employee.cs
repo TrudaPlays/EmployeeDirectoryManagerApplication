@@ -42,9 +42,9 @@ namespace EmployeeDirectoryManagerApplication
                 throw new ArgumentException("Salary must be a number.", nameof(salary));
             }
 
-            if (HireDate > DateTime.Today)
+            if (hiredate > DateTime.Today)
             {
-                throw new ArgumentException("Hire date cannot be in the future.", nameof(HireDate));
+                throw new ArgumentException("Hire date cannot be in the future.", nameof(hiredate));
             }
 
             // All validations passed → assign values

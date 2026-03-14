@@ -69,6 +69,7 @@
             this.btnSave.TabIndex = 1;
             this.btnSave.Text = "Save to CSV File";
             this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnUpdateEmployee
             // 
@@ -108,6 +109,7 @@
             this.btnLoad.TabIndex = 5;
             this.btnLoad.Text = "Load from CSV File";
             this.btnLoad.UseVisualStyleBackColor = true;
+            this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
             // 
             // EmployeeID
             // 
