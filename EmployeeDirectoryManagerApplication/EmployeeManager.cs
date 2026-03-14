@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -14,14 +15,14 @@ namespace EmployeeDirectoryManagerApplication
     {
         public BindingList<Employee> Employees { get; } = new BindingList<Employee>();
 
-
+        //adds some initial data into the form upon loading
         public void AddTestData()
         {
             try
             {
                 Employees.Add(new Employee(
                     id: "T5600",
-                    fullname: "Truda Test Developer",
+                    fullname: "Truda Developer",
                     department: "IT",
                     role: "Senior Developer",
                     salary: 56000.0,
@@ -29,7 +30,7 @@ namespace EmployeeDirectoryManagerApplication
                     ));
                 Employees.Add(new Employee(
                     id: "M4123",
-                    fullname: "Mark Quality Assurance",
+                    fullname: "Mark Assurance",
                     department: "QA",
                     role: "Tester",
                     salary: 52000.0,
@@ -63,6 +64,11 @@ namespace EmployeeDirectoryManagerApplication
             else if (string.IsNullOrWhiteSpace(e.Salary.ToString()))//checks for an empty textbox
                 { throw new ArgumentException("Salary is required.", nameof(e.Salary)); }
 
+            else if (e.HireDate > DateTime.Today)
+            {
+                throw new ArgumentOutOfRangeException("Hire Date cannot be in the future", nameof(e.HireDate));
+            }
+
             // non-zero salary check
             else if (e.Salary <= 0)
             {
@@ -89,6 +95,8 @@ namespace EmployeeDirectoryManagerApplication
                 }
 
             }
+
+
             //if all checks have passed now it adds the employee to the list
             Employees.Add(e);
 
@@ -130,17 +138,28 @@ namespace EmployeeDirectoryManagerApplication
 
         public bool DeleteEmployee(string employeeID)
         {
-            // Find the exact employee by their ID (case-insensitive comparison)
-            var toRemove = Employees.FirstOrDefault(e => string.Equals(e.EmployeeID, employeeID, StringComparison.OrdinalIgnoreCase));
-
-            if (toRemove == null)
+            if (employeeID == null)
             {
-                return false;// not found
+                throw new ArgumentNullException(nameof(employeeID));
+            }
+            if (string.IsNullOrWhiteSpace(employeeID))
+            {
+                throw new ArgumentException("Employee ID is required for deletion.", nameof(employeeID));
+            }
+
+            // Find the employee to delete
+            var toDelete = Employees.FirstOrDefault(e => string.Equals(e.EmployeeID, employeeID, StringComparison.OrdinalIgnoreCase));
+
+            if (toDelete == null)
+            {
+                throw new ArgumentException($"No employee found with ID '{employeeID}'.");
             }
             else
             {
-                Employees.Remove(toRemove);
-                return true;// successfully deleted the employee
+                // if everything checks out we delete the employee
+                Employees.Remove(toDelete);
+                Employees.ResetBindings();
+                return true;
             }
         }
 

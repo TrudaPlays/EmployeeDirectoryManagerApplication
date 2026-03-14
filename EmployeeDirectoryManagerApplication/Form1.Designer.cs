@@ -98,6 +98,7 @@
             this.btnExitForm.TabIndex = 4;
             this.btnExitForm.Text = "Exit Form";
             this.btnExitForm.UseVisualStyleBackColor = true;
+            this.btnExitForm.Click += new System.EventHandler(this.btnExitForm_Click);
             // 
             // btnLoad
             // 

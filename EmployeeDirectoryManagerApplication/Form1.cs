@@ -209,6 +209,7 @@ namespace EmployeeDirectoryManagerApplication
             }
         }
 
+        //deletes an employee either by ID alone or if the user clicks on a row
         private void btnDeleteEmployee_Click(object sender, EventArgs e)
         {
             try
@@ -223,9 +224,7 @@ namespace EmployeeDirectoryManagerApplication
 
                 // Get current values from inputs
                 string id = textEmployeeID.Text.Trim();
-                string department = textDepartment.Text.Trim();
-                string role = textRole.Text.Trim();
-                
+                string fullname = textFullName.Text.Trim();
 
                 // Basic required fields check
                 if (string.IsNullOrWhiteSpace(id))
@@ -235,12 +234,10 @@ namespace EmployeeDirectoryManagerApplication
                     return;
                 }
 
-                var updatedEmployee = new Employee(id);
-
-                manager.DeleteEmployee(updatedEmployee);
+                manager.DeleteEmployee(id);
 
                 // Success
-                MessageLabel.Text = $"Employee '{fullName}' (ID: {id}) updated successfully.";
+                MessageLabel.Text = $"Employee '{fullname}' (ID: {id}) updated successfully.";
                 MessageLabel.ForeColor = Color.DarkGreen;
 
                 EmployeesDataGridView.Refresh();
@@ -256,6 +253,11 @@ namespace EmployeeDirectoryManagerApplication
                 MessageLabel.Text = ex.Message;
                 MessageLabel.ForeColor = Color.OrangeRed;
             }
+        }
+
+        private void btnExitForm_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }
