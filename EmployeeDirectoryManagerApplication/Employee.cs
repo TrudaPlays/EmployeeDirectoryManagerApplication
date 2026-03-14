@@ -6,12 +6,12 @@ namespace EmployeeDirectoryManagerApplication
 {
     public sealed class Employee
     {
-        public string EmployeeID { get; }
-        public string FullName { get; }
-        public string Department { get; }
-        public string Role { get; }
-        public double Salary { get; }
-        public DateTime HireDate { get; }
+        public string EmployeeID { get; set; }
+        public string FullName { get; set; }
+        public string Department { get; set; }
+        public string Role { get; set; }
+        public double Salary { get; set; }
+        public DateTime HireDate { get; set; }
 
         // Constructor with validation
         public Employee(string id, string fullname, string department, string role, double salary, DateTime hiredate)
@@ -42,8 +42,10 @@ namespace EmployeeDirectoryManagerApplication
                 throw new ArgumentException("Salary must be a number.", nameof(salary));
             }
 
-            // Force date-only
-            DateTime HireDate = hiredate.Date;
+            if (HireDate > DateTime.Today)
+            {
+                throw new ArgumentException("Hire date cannot be in the future.", nameof(HireDate));
+            }
 
             // All validations passed → assign values
             EmployeeID = id.Trim();

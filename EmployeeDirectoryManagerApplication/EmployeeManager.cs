@@ -15,15 +15,16 @@ namespace EmployeeDirectoryManagerApplication
 
         public void AddEmployee(Employee e)
         {
+            //validate data first
             if (e == null)
-                { throw new ArgumentNullException(nameof(e)); }
+            { throw new ArgumentNullException(nameof(e)); }
 
             else if (string.IsNullOrWhiteSpace(e.EmployeeID)) //
-                { throw new ArgumentException("Employee ID is required.", nameof(e.EmployeeID)); }
+            { throw new ArgumentException("Employee ID is required.", nameof(e.EmployeeID)); }
 
             else if (string.IsNullOrWhiteSpace(e.FullName)) //checks for an empty textbox
-                { throw new ArgumentException("Full name is required.", nameof(e.FullName)); }
-            
+            { throw new ArgumentException("Full name is required.", nameof(e.FullName)); }
+
             else if (string.IsNullOrWhiteSpace(e.Department)) //checks for an empty textbox
             { throw new ArgumentException("Department is required.", nameof(e.Department)); }
 
@@ -31,17 +32,60 @@ namespace EmployeeDirectoryManagerApplication
             { throw new ArgumentException("Role is required.", nameof(e.Role)); }
 
             else if (string.IsNullOrWhiteSpace(e.Salary.ToString()))//checks for an empty textbox
-            { throw new ArgumentException("Salary is required.", nameof(e.Salary)); }
+                { throw new ArgumentException("Salary is required.", nameof(e.Salary)); }
+
+            // non-zero salary check
+            else if (e.Salary <= 0)
+            {
+                throw new ArgumentException("Salary must be a positive number.", nameof(e.Salary));
+            }
+            //non numeric values check
+            else if (double.IsNaN(e.Salary))
+            {
+                throw new ArgumentException("Salary must be a number.", nameof(e.Salary));
+            }
+
+            foreach (var existing in Employees) //loops through the entire employees to make sure there is not duplicate either by the ID or the name
+            {
+                //checks for employee id clash
+                if (existing.EmployeeID.Equals(e.EmployeeID, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException(
+                        $"An employee with ID '{e.EmployeeID} already exists.");
+                }
+                //checks for name clash
+                else if (existing.FullName.Equals(e.FullName, StringComparison.OrdinalIgnoreCase))
+                {
+                    $"An employee with this name: '{e.FullName}' already exists. ");
+                }
+
+            }
+            //if all checks have passed now it adds the employee to the list
+            Employees.Add(e);
 
         }
-        
 
-        public bool DeleteEmployee(string employeeID, string fullName)
+        //method to update an employee's data
+        public void UpdateEmployeeData(string employeeID)
         {
-            // Find the exact booking (case-insensitive comparison)
+            // Find the employee to update
+            var ID = employeeID;
+
+            if (!employeeID.Equals(ID, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException("No employee with specified ID exists.", employeeID);
+            }
+
+
+
+
+        }
+
+        public bool DeleteEmployee(string employeeID)
+        {
+            // Find the exact employee by their ID (case-insensitive comparison)
             var toRemove = Employees.FirstOrDefault(b =>
-                b.EmployeeID.Equals(employeeID, StringComparison.OrdinalIgnoreCase) &&
-                b.FullName.Equals(fullName, StringComparison.OrdinalIgnoreCase));
+                b.EmployeeID.Equals(employeeID, StringComparison.OrdinalIgnoreCase));
 
             if (toRemove == null)
             {
@@ -50,89 +94,19 @@ namespace EmployeeDirectoryManagerApplication
             else
             {
                 Employees.Remove(toRemove);
-                return true;// successfully deleted employee
+                return true;// successfully deleted the employee
             }
         }
 
-        public bool TryToFindEmployee(string employeeID, string fullName, out Employee employee)
-        {
-            employee = Employees.FirstOrDefault(b =>
-            b.EmployeeID.Equals(employeeID, StringComparison.OrdinalIgnoreCase) &&
-            b.FullName.Equals(fullName, StringComparison.OrdinalIgnoreCase));
-
-            return employee != null;
-        }
-        /*Created a public bool IsAvailable() passes in roomNumber and DateTime
-        for checkIn and checkOut
-        //Used a try catch block run EnsureNoOverlap. Returns true if successful,
-        catch and returns false if not*/
-
-        public bool IsAvailable(string roomNumber, DateTime checkIn, DateTime checkOut)
-        {
-            try
-            {
-                EnsureNoOverlap(roomNumber, checkIn, checkOut, except: null);
-                return true;   // no exception = available
-            }
-            catch (InvalidOperationException)
-            {
-                return false;  // overlap found
-            }
-        }
-
-        //method to reschedule booking
-        public void RescheduleBooking(string roomNumber, string guestName, DateTime newCheckIn, DateTime newCheckOut)
-        {
-            // Find the booking to reschedule
-            if (!TryFindBooking(roomNumber, guestName, out Booking? booking) || booking == null)
-            {
-                throw new InvalidOperationException($"No booking found for guest '{guestName}' in room '{roomNumber}'.");
-            }
-
-            // Check for overlap with OTHER bookings (exclude this one)
-            if (IsAvailable(roomNumber, newCheckIn, newCheckOut))
-            {
-                // If no overlap → apply the change
-                booking.Reschedule(newCheckIn, newCheckOut);
-            }
-            else
-            {
-                throw new InvalidOperationException(
-                    $"Room {roomNumber} already booked {newCheckIn:MM/dd}–{newCheckOut:MM/dd}.");
-            }
-
-
-        }
-
-
-        //!!! Helper method for you to check if a room has an overlapping
-        //visit.Do not modify
-        private void EnsureNoOverlap(string roomNumber, DateTime checkIn, DateTime checkOut, Booking? except)
-        {
-            bool Overlaps(Booking a) => a.CheckIn < checkOut && checkIn <
-            a.CheckOut;
-            foreach (var existing in _bookings)
-            {
-                if (except != null && ReferenceEquals(existing, except)) continue;
-                if (!existing.RoomNumber.Equals(roomNumber,
-                StringComparison.OrdinalIgnoreCase)) continue;
-
-                if (Overlaps(existing))
-                {
-                    throw new InvalidOperationException(
-                    $"Room {roomNumber} already booked {existing.CheckIn:MM/dd}–{existing.CheckOut:MM/dd}.");
-                }
-            }
-        }
 
         //!!! Helper Methods for the CSV. Do not modify anything below this
         //line
-// -------- Persistence (CSV) --------
-public void SaveToCsv(string path)
+        // -------- Persistence (CSV) --------
+        public void SaveToCsv(string path)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))
             ?? ".");
-            var sw = new StreamWriter(path, false, new
+            StreamWriter sw = new StreamWriter(path, false, new
             UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
             sw.WriteLine("Id,FullName,Department,Role,Salary,HireDate");
             foreach (var e in Employees)
@@ -156,7 +130,7 @@ public void SaveToCsv(string path)
                     // Enforce unique ID on load as well
                     if (Employees.Any(x => string.Equals(x.EmployeeID, e.EmployeeID, StringComparison.OrdinalIgnoreCase)))
                         throw new InvalidOperationException($"Duplicate ID '{e.EmployeeID}'in file.");
-                        Employees.Add(e);
+                    Employees.Add(e);
                     loaded++;
                 }
                 catch (Exception ex)
@@ -171,5 +145,3 @@ public void SaveToCsv(string path)
     }
 }
 
-    }
-}
