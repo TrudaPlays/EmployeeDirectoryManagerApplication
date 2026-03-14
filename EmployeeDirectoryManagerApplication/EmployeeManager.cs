@@ -5,6 +5,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using System.Xml.Linq;
 
 namespace EmployeeDirectoryManagerApplication
@@ -13,6 +14,34 @@ namespace EmployeeDirectoryManagerApplication
     {
         public BindingList<Employee> Employees { get; } = new BindingList<Employee>();
 
+
+        public void AddTestData()
+        {
+            try
+            {
+                Employees.Add(new Employee(
+                    id: "T5600",
+                    fullname: "Truda Test Developer",
+                    department: "IT",
+                    role: "Senior Developer",
+                    salary: 56000.0,
+                    hiredate: new DateTime(2023, 6, 15)
+                    ));
+                Employees.Add(new Employee(
+                    id: "M4123",
+                    fullname: "Mark Quality Assurance",
+                    department: "QA",
+                    role: "Tester",
+                    salary: 52000.0,
+                    hiredate: new DateTime(2024, 1, 10)
+                ));
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Test data failed: {e.Message} ");
+            }
+        
+        }
         public void AddEmployee(Employee e)
         {
             //validate data first
@@ -56,7 +85,7 @@ namespace EmployeeDirectoryManagerApplication
                 //checks for name clash
                 else if (existing.FullName.Equals(e.FullName, StringComparison.OrdinalIgnoreCase))
                 {
-                    $"An employee with this name: '{e.FullName}' already exists. ");
+                   throw new InvalidOperationException($"An employee with this name: '{e.FullName}' already exists.");
                 }
 
             }
@@ -66,19 +95,37 @@ namespace EmployeeDirectoryManagerApplication
         }
 
         //method to update an employee's data
-        public void UpdateEmployeeData(string employeeID)
+        public void UpdateEmployeeData(Employee updated)
         {
-            // Find the employee to update
-            var ID = employeeID;
-
-            if (!employeeID.Equals(ID, StringComparison.OrdinalIgnoreCase))
+            if (updated == null)
             {
-                throw new ArgumentException("No employee with specified ID exists.", employeeID);
+                throw new ArgumentNullException(nameof(updated));
+            }
+            if (string.IsNullOrWhiteSpace(updated.EmployeeID))
+            {
+                throw new ArgumentException("Employee ID is required for update.", nameof(updated.EmployeeID));
             }
 
+            // Find the employee to update
+            var existing = Employees.FirstOrDefault(e=> string.Equals(e.EmployeeID, updated.EmployeeID, StringComparison.OrdinalIgnoreCase));
 
+            if (existing == null)
+            {
+                throw new ArgumentException($"No employee found with ID '{updated.EmployeeID}'.");
+            }
 
+            // if everything checks out we update the data
+            existing.FullName = updated.FullName?.Trim() ?? existing.FullName;
+            existing.Department = updated.Department?.Trim() ?? existing.Department;
+            existing.Role = updated.Role?.Trim() ?? existing.Role;
+            existing.Salary = updated.Salary;
+            existing.HireDate = updated.HireDate.Date;   // keep date-only
 
+            if (existing.Salary <= 0)
+            {
+                throw new ArgumentException("Salary must be greater than zero.", nameof(updated.Salary));
+            }
+            Employees.ResetBindings();
         }
 
         public bool DeleteEmployee(string employeeID)
@@ -108,9 +155,12 @@ namespace EmployeeDirectoryManagerApplication
             ?? ".");
             StreamWriter sw = new StreamWriter(path, false, new
             UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-            sw.WriteLine("Id,FullName,Department,Role,Salary,HireDate");
+            sw.WriteLine("EmployeeID,FullName,Department,Role,Salary,HireDate");
             foreach (var e in Employees)
+            {
                 sw.WriteLine(e.ToCsv());
+            }
+                
         }
         public void LoadFromCsv(string path)
         {
@@ -133,7 +183,7 @@ namespace EmployeeDirectoryManagerApplication
                     Employees.Add(e);
                     loaded++;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     skipped++;
                     // For classroom apps, a console note is fine; in prod you'd

@@ -62,9 +62,9 @@
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(623, 389);
+            this.btnSave.Location = new System.Drawing.Point(1051, 372);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(117, 49);
+            this.btnSave.Size = new System.Drawing.Size(117, 66);
             this.btnSave.TabIndex = 1;
             this.btnSave.Text = "Save to CSV File";
             this.btnSave.UseVisualStyleBackColor = true;
@@ -77,6 +77,7 @@
             this.btnUpdateEmployee.TabIndex = 2;
             this.btnUpdateEmployee.Text = "Update";
             this.btnUpdateEmployee.UseVisualStyleBackColor = true;
+            this.btnUpdateEmployee.Click += new System.EventHandler(this.btnUpdateEmployee_Click);
             // 
             // btnAddEmployee
             // 
@@ -86,21 +87,22 @@
             this.btnAddEmployee.TabIndex = 3;
             this.btnAddEmployee.Text = "Add";
             this.btnAddEmployee.UseVisualStyleBackColor = true;
+            this.btnAddEmployee.Click += new System.EventHandler(this.btnAddEmployee_Click);
             // 
             // btnExitForm
             // 
-            this.btnExitForm.Location = new System.Drawing.Point(918, 389);
+            this.btnExitForm.Location = new System.Drawing.Point(1324, 372);
             this.btnExitForm.Name = "btnExitForm";
-            this.btnExitForm.Size = new System.Drawing.Size(117, 49);
+            this.btnExitForm.Size = new System.Drawing.Size(117, 66);
             this.btnExitForm.TabIndex = 4;
             this.btnExitForm.Text = "Exit Form";
             this.btnExitForm.UseVisualStyleBackColor = true;
             // 
             // btnLoad
             // 
-            this.btnLoad.Location = new System.Drawing.Point(769, 389);
+            this.btnLoad.Location = new System.Drawing.Point(1184, 372);
             this.btnLoad.Name = "btnLoad";
-            this.btnLoad.Size = new System.Drawing.Size(117, 49);
+            this.btnLoad.Size = new System.Drawing.Size(117, 66);
             this.btnLoad.TabIndex = 5;
             this.btnLoad.Text = "Load from CSV File";
             this.btnLoad.UseVisualStyleBackColor = true;
@@ -125,7 +127,7 @@
             // 
             this.textFullName.Location = new System.Drawing.Point(130, 90);
             this.textFullName.Name = "textFullName";
-            this.textFullName.Size = new System.Drawing.Size(100, 26);
+            this.textFullName.Size = new System.Drawing.Size(235, 26);
             this.textFullName.TabIndex = 9;
             // 
             // FullName
@@ -157,7 +159,7 @@
             // 
             this.textRole.Location = new System.Drawing.Point(130, 195);
             this.textRole.Name = "textRole";
-            this.textRole.Size = new System.Drawing.Size(100, 26);
+            this.textRole.Size = new System.Drawing.Size(199, 26);
             this.textRole.TabIndex = 13;
             // 
             // Role
@@ -187,15 +189,15 @@
             // 
             // dateTimePickerHireDate
             // 
-            this.dateTimePickerHireDate.Location = new System.Drawing.Point(381, 35);
+            this.dateTimePickerHireDate.Location = new System.Drawing.Point(371, 35);
             this.dateTimePickerHireDate.Name = "dateTimePickerHireDate";
-            this.dateTimePickerHireDate.Size = new System.Drawing.Size(200, 26);
+            this.dateTimePickerHireDate.Size = new System.Drawing.Size(293, 26);
             this.dateTimePickerHireDate.TabIndex = 16;
             // 
             // HireDate
             // 
             this.HireDate.AutoSize = true;
-            this.HireDate.Location = new System.Drawing.Point(298, 41);
+            this.HireDate.Location = new System.Drawing.Point(288, 41);
             this.HireDate.Name = "HireDate";
             this.HireDate.Size = new System.Drawing.Size(77, 20);
             this.HireDate.TabIndex = 17;
@@ -204,17 +206,18 @@
             // EmployeesDataGridView
             // 
             this.EmployeesDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.EmployeesDataGridView.Location = new System.Drawing.Point(328, 96);
+            this.EmployeesDataGridView.Location = new System.Drawing.Point(443, 96);
             this.EmployeesDataGridView.Name = "EmployeesDataGridView";
             this.EmployeesDataGridView.RowHeadersWidth = 62;
             this.EmployeesDataGridView.RowTemplate.Height = 28;
-            this.EmployeesDataGridView.Size = new System.Drawing.Size(735, 270);
+            this.EmployeesDataGridView.Size = new System.Drawing.Size(1047, 270);
             this.EmployeesDataGridView.TabIndex = 18;
+            this.EmployeesDataGridView.RowHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.EmployeesDataGridView_RowHeaderMouseClick);
             // 
             // MessageLabel
             // 
             this.MessageLabel.AutoSize = true;
-            this.MessageLabel.Location = new System.Drawing.Point(234, 403);
+            this.MessageLabel.Location = new System.Drawing.Point(254, 403);
             this.MessageLabel.Name = "MessageLabel";
             this.MessageLabel.Size = new System.Drawing.Size(183, 20);
             this.MessageLabel.TabIndex = 19;
@@ -224,7 +227,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1101, 450);
+            this.ClientSize = new System.Drawing.Size(1502, 450);
             this.Controls.Add(this.MessageLabel);
             this.Controls.Add(this.EmployeesDataGridView);
             this.Controls.Add(this.HireDate);
@@ -247,6 +250,7 @@
             this.Controls.Add(this.btnDeleteEmployee);
             this.Name = "EmployeeDirectoryManagerForm";
             this.Text = "EmployeeDirectoryManager";
+            this.Load += new System.EventHandler(this.EmployeeDirectoryManagerForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.EmployeesDataGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
